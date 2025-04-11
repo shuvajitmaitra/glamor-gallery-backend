@@ -4,6 +4,18 @@
     {
       "src": "index.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "models/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "routes/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "middlewares/**/*.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
