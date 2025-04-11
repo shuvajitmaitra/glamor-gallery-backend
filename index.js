@@ -1,10 +1,10 @@
-// // index.js
+// index.js
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
-// const authRoutes = require("./routes/auth");
-// const productRoutes = require("./routes/product");
+const authRoutes = require("./routes/auth.js");
+const productRoutes = require("./routes/product.js");
 
 dotenv.config();
 const app = express();
@@ -28,8 +28,8 @@ app.get("/health", (req, res) => {
   });
 });
 
-// // Routes
-// app.use("/api/auth", authRoutes);
+// Routes
+app.use("/api/auth", authRoutes);
 app.use("/api/product", productRoutes);
 
 const PORT = process.env.PORT || 5000;
