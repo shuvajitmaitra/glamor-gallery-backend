@@ -12,7 +12,7 @@ const app = express();
 // Add CORS middleware before other middleware and routes
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5174", // Replace with your frontend URL
+    origin: "*", // Replace with your frontend URL
     credentials: true,
   })
 );

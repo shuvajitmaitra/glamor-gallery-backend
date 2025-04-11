@@ -18,9 +18,7 @@ router.post("/", authMiddleware, async (req, res) => {
 // Get all products
 router.get("/", async (req, res) => {
   try {
-    console.log("Fetching all products");
     const products = await Product.find();
-    // console.log(products);
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: err.message });
