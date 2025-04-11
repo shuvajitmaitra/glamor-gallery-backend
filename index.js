@@ -19,6 +19,15 @@ app.use(
 
 app.use(express.json());
 
+// Health Check Route
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Server is running",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/product", productRoutes);
@@ -35,14 +44,5 @@ mongoose
   })
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// const data = {
-//   available: boolean,
-//   availableSize: ["data1", "data2"], // array of string
-//   productName: string,
-//   productImage: ["image1", "image2"], // array of string
-//   buyPrice: number,
-//   askingPrice: number,
-//   sellingPrice: number,
-//   stock: number,
-//   category: string,
-// };
+// Export the app for Vercel
+module.exports = app;
