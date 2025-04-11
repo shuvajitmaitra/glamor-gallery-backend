@@ -19,14 +19,14 @@ app.use(
 
 app.use(express.json());
 
-// // Health Check Route
-// app.get("/health", (req, res) => {
-//   res.status(200).json({
-//     status: "OK",
-//     message: "Server is running",
-//     timestamp: new Date().toISOString(),
-//   });
-// });
+// Health Check Route
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Server is running",
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // // Routes
 // app.use("/api/auth", authRoutes);
@@ -44,5 +44,4 @@ mongoose
   })
   .catch((err) => console.error("MongoDB connection error:", err));
 
-app.get("/", (req, res) => res.send("Hello from Vercel!"));
 module.exports = app;
