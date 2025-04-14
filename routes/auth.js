@@ -1,7 +1,7 @@
 // routes/auth.js
 const express = require("express");
 const router = express.Router();
-const User = require("../models/User");
+// const User = require("../models/User");
 
 try {
   if (!User) {
@@ -14,29 +14,31 @@ try {
 // const jwt = require("jsonwebtoken");
 
 router.post("/register", async (req, res) => {
-  try {
-    const { email, password } = req.body;
+  // console.log(first)
+  // try {
+  //   const { email, password } = req.body;
 
-    // Validate input
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
-    }
+  //   // Validate input
+  //   if (!email || !password) {
+  //     return res.status(400).json({ message: "Email and password are required" });
+  //   }
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({ message: "User already exists" });
-    }
+  //   // Check if user already exists
+  //   const existingUser = await User.findOne({ email });
+  //   if (existingUser) {
+  //     return res.status(409).json({ message: "User already exists" });
+  //   }
 
-    // Create new user
-    const user = new User({ email, password });
-    await user.save();
+  //   // Create new user
+  //   const user = new User({ email, password });
+  //   await user.save();
 
-    res.status(201).json({ message: "Account created successfully" });
-  } catch (error) {
-    console.error("Registration Error:", error);
-    res.status(500).json({ error: error.message });
-  }
+  //   res.status(201).json({ message: "Account created successfully" });
+  // } catch (error) {
+  //   console.error("Registration Error:", error);
+  //   res.status(500).json({ error: error.message });
+  // }
+  res.status(201).json({ message: "Account created successfully" });
 });
 
 // router.post("/login", async (req, res) => {
