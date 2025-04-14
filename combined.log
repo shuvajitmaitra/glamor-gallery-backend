@@ -9,3 +9,6 @@
 {"level":"info","message":"MongoDB connection attempt 1","timestamp":"2025-04-14T17:08:54.203Z"}
 {"level":"info","message":"Glamor Gallery server running on PORT: 9000","timestamp":"2025-04-14T17:08:54.209Z"}
 {"level":"info","message":"MongoDB connected successfully!","timestamp":"2025-04-14T17:08:54.874Z"}
+{"level":"info","message":"MongoDB connection attempt 1","timestamp":"2025-04-14T17:46:42.157Z"}
+{"level":"info","message":"Glamor Gallery server running on PORT: 9000","timestamp":"2025-04-14T17:46:42.163Z"}
+{"level":"info","message":"MongoDB connected successfully!","timestamp":"2025-04-14T17:46:42.997Z"}
