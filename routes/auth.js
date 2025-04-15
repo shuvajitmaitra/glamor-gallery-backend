@@ -3,16 +3,6 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 
-// try {
-//   if (!User) {
-//     throw new Error("User model could not be imported");
-//   }
-// } catch (importError) {
-//   console.error("User Model Import Error:", importError);
-// }
-
-// const jwt = require("jsonwebtoken");
-
 router.post("/register", async (req, res) => {
   // console.log(first)
   try {
