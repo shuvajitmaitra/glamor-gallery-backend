@@ -27,21 +27,21 @@ router.post("/register", async (req, res) => {
     res.status(201).json({ message: "Account created successfully" });
   } catch (error) {
     console.error("Registration Error:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
-  res.status(201).json({ message: "Account created successfully" });
+  res.status(201).json({ success: true, message: "Account created successfully" });
 });
 
 router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (!user || req.body.password !== user.password) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
-    res.json({ success: true, token });
+    res.json({ success: true, user: { ...user, token } });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
