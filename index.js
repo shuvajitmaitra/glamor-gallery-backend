@@ -37,7 +37,7 @@ app.use(
 app.use(express.json());
 
 // Health Check Route
-app.get("/health", (req, res) => {
+app.get("/", (req, res) => {
   res.status(200).json({
     status: "OK",
     message: "Server is running",

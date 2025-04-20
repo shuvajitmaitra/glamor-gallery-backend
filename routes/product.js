@@ -5,23 +5,23 @@ const Product = require("../models/Product");
 const authMiddleware = require("../middlewares/authMiddleware");
 
 // Create product
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/create", authMiddleware, async (req, res) => {
   try {
     const product = new Product({ ...req.body, addedBy: req.userId });
     await product.save();
-    res.status(201).json(product);
+    res.status(201).json({ success: true, product });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ success: false, error: err.message });
   }
 });
 
 // Get all products
-router.get("/", async (req, res) => {
+router.get("/products", async (req, res) => {
   try {
     const products = await Product.find();
-    res.json(products);
+    res.json({ success: true, products });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
@@ -29,9 +29,9 @@ router.get("/", async (req, res) => {
 router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updatedProduct);
+    res.json({ success: true, product: updatedProduct });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ success: false, error: err.message });
   }
 });
 
@@ -39,9 +39,9 @@ router.put("/:id", authMiddleware, async (req, res) => {
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
-    res.json({ message: "Product deleted" });
+    res.json({ success: true, message: "Product deleted" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
