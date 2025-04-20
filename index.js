@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const authRoutes = require("./routes/auth.js");
 const productRoutes = require("./routes/product.js");
+const historyRoutes = require("./routes/history.js");
 
 dotenv.config();
 const app = express();
@@ -49,6 +50,7 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/product", productRoutes);
+app.use("/api/history", historyRoutes);
 
 const PORT = process.env.PORT || 5000;
 

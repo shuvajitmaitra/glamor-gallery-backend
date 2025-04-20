@@ -7,11 +7,11 @@ const jwt = require("jsonwebtoken");
 router.post("/register", async (req, res) => {
   // console.log(first)
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
 
     // Validate input
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+    if (!email || !password || !name) {
+      return res.status(400).json({ message: "Email, password, and name are required" });
     }
 
     // Check if user already exists
