@@ -36,7 +36,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
 });
 
 // Delete product
-router.delete("/:id", authMiddleware, async (req, res) => {
+router.delete("/delete/:id", authMiddleware, async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: "Product deleted" });
