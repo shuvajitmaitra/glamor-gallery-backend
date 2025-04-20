@@ -26,7 +26,7 @@ router.get("/products", async (req, res) => {
 });
 
 // Edit product
-router.put("/:id", authMiddleware, async (req, res) => {
+router.put("/edit/:id", authMiddleware, async (req, res) => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json({ success: true, product: updatedProduct });
