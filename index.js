@@ -59,7 +59,7 @@ module.exports = async (req, res) => {
   await connectDB();
 
   // Handle the request
-  if (req.method === "GET" && req.url === "/health") {
+  if (req.method === "GET" && req.url === "/") {
     res.status(200).json({
       status: "OK",
       message: "Server is running",
