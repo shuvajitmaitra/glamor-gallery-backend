@@ -39,8 +39,32 @@ router.put("/edit/:id", authMiddleware, async (req, res) => {
 // Delete product
 router.delete("/delete/:id", authMiddleware, async (req, res) => {
   try {
-    await Product.findByIdAndDelete(req.params.id);
-    res.json({ success: true, message: "Product deleted" });
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, error: "Invalid product ID" });
+    }
+
+    // Check if product exists
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ success: false, error: "Product not found" });
+    }
+
+    // Use a transaction to delete product and update history
+    const session = await mongoose.startSession();
+    try {
+      await session.withTransaction(async () => {
+        // Delete the product
+        await Product.findByIdAndDelete(req.params.id, { session });
+
+        // Update history records to set productId to null and productCode to ""
+        await History.updateMany({ productId: req.params.id }, { $set: { productId: null, productCode: "" } }, { session });
+      });
+
+      res.json({ success: true, message: "Product deleted and history references updated" });
+    } finally {
+      session.endSession();
+    }
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
