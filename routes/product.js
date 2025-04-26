@@ -8,14 +8,40 @@ const authMiddleware = require("../middlewares/authMiddleware");
 // Create product
 router.post("/create", authMiddleware, async (req, res) => {
   try {
-    const product = new Product({ ...req.body, addedBy: req.userId });
+    const { productImage, ...otherFields } = req.body;
+
+    // Parse productImage if it's a stringified array
+    let parsedProductImage = productImage;
+    if (typeof productImage === "string") {
+      try {
+        parsedProductImage = JSON.parse(productImage);
+        if (!Array.isArray(parsedProductImage)) {
+          throw new Error("productImage must be an array");
+        }
+        // Ensure each element is a string
+        if (!parsedProductImage.every((item) => typeof item === "string")) {
+          throw new Error("All productImage entries must be strings");
+        }
+      } catch (parseError) {
+        return res.status(400).json({ success: false, error: "Invalid productImage format" });
+      }
+    } else if (productImage && !Array.isArray(productImage)) {
+      return res.status(400).json({ success: false, error: "productImage must be an array" });
+    }
+
+    // Create product with parsed data
+    const product = new Product({
+      ...otherFields,
+      productImage: parsedProductImage || [], // Default to empty array if undefined
+      addedBy: req.userId,
+    });
+
     await product.save();
     res.status(201).json({ success: true, product });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
 });
-
 // Get all products
 router.get("/products", async (req, res) => {
   try {
