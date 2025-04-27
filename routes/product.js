@@ -163,4 +163,12 @@ router.put("/stock/:id", authMiddleware, async (req, res) => {
     res.status(400).json({ success: false, error: err.message });
   }
 });
+router.get("/history", authMiddleware, async (req, res) => {
+  try {
+    const history = await History.find().populate("userId", "name");
+    res.json({ success: true, history });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 module.exports = router;
