@@ -4,6 +4,7 @@ const router = express.Router();
 const Product = require("../models/Product");
 const History = require("../models/History");
 const authMiddleware = require("../middlewares/authMiddleware");
+const mongoose = require("mongoose");
 
 // Create product
 router.post("/create", authMiddleware, async (req, res) => {
