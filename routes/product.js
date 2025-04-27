@@ -182,4 +182,51 @@ router.get("/history", authMiddleware, async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+
+router.delete("/history/delete/:id", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the history record
+    const history = await History.findById(id);
+    if (!history) {
+      return res.status(404).json({ success: false, error: "History record not found" });
+    }
+
+    // Find the corresponding product
+    const product = await Product.findById(history.productId);
+    if (!product) {
+      return res.status(404).json({ success: false, error: "Product not found" });
+    }
+
+    // Update product stock based on history type
+    if (history.type === "in") {
+      // Subtract quantity for "in" type
+      if (product.stock < history.quantity) {
+        return res.status(400).json({
+          success: false,
+          error: "Cannot delete: Insufficient stock to subtract",
+        });
+      }
+      product.stock -= history.quantity;
+    } else if (history.type === "out") {
+      // Add quantity for "out" type
+      product.stock += history.quantity;
+    }
+
+    // Save the updated product
+    await product.save();
+
+    // Delete the history record
+    await History.findByIdAndDelete(id);
+
+    res.json({
+      success: true,
+      message: "History record deleted and product stock updated",
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;
