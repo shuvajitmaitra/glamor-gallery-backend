@@ -21,7 +21,7 @@ router.post("/register", async (req, res) => {
     }
 
     // Create new user
-    const user = new User({ email, password });
+    const user = new User({ email, password, name });
     await user.save();
 
     res.status(201).json({ message: "Account created successfully" });
