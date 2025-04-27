@@ -96,8 +96,7 @@ router.delete("/delete/:id", authMiddleware, async (req, res) => {
   }
 });
 
-const mongoose = require("mongoose");
-
+// Update stock
 router.put("/stock/:id", authMiddleware, async (req, res) => {
   try {
     const { action, quantity, note } = req.body;
@@ -144,7 +143,7 @@ router.put("/stock/:id", authMiddleware, async (req, res) => {
         const history = new History({
           productId: req.params.id,
           productCode: updatedProduct.productCode,
-          action,
+          type: action,
           userId: req.userId,
           quantity,
           note: note || "", // Use provided note or default to empty string

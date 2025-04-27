@@ -13,7 +13,6 @@ const historySchema = new mongoose.Schema(
       required: false, // Changed to optional
       default: "", // Allow empty string
     },
-    action: { type: String, enum: ["in", "out"], required: true },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
