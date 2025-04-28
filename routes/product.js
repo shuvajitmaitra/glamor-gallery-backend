@@ -53,6 +53,7 @@ router.get("/products", async (req, res) => {
   }
 });
 
+// Edit product
 router.put("/edit/:id", authMiddleware, async (req, res) => {
   try {
     // Validate ObjectId
