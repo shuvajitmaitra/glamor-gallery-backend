@@ -53,13 +53,29 @@ router.get("/products", async (req, res) => {
   }
 });
 
-// Edit product
 router.put("/edit/:id", authMiddleware, async (req, res) => {
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json({ success: true, product: updatedProduct });
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, error: "Invalid product ID" });
+    }
+
+    // Update product with validation
+    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+
+    // Check if product exists
+    if (!updatedProduct) {
+      return res.status(404).json({ success: false, error: "Product not found" });
+    }
+
+    // Send success response
+    res.status(200).json({ success: true, product: updatedProduct });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    // Log error for debugging
+    console.error("Error updating product:", err);
+
+    // Send detailed error response
+    res.status(400).json({ success: false, error: err.message || "Failed to update product" });
   }
 });
 
