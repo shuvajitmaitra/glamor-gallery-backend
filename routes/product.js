@@ -183,7 +183,7 @@ router.put("/stock/:id", authMiddleware, async (req, res) => {
 });
 router.get("/history", authMiddleware, async (req, res) => {
   try {
-    const history = await History.find().populate("userId", "name");
+    const history = await History.find().populate("userId", "name").sort({ createdAt: -1 });
 
     // Group history by type
     const stockIn = history.filter((item) => item.type === "in");
