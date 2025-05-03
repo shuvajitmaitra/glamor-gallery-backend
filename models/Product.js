@@ -24,6 +24,7 @@ const productSchema = new mongoose.Schema(
     sellingPrice: { type: Number, min: 0 },
     stock: { type: Number, default: 0, min: 0 },
     category: { type: String, required: true, trim: true },
+    subCategory: { type: String, trim: true },
     description: { type: String, trim: true },
     addedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
