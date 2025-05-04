@@ -54,6 +54,19 @@ router.get("/products", async (req, res) => {
   }
 });
 
+// Get product by ID
+router.get("/product/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ success: false, error: "Product not found" });
+    }
+    res.json({ success: true, product });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // Edit product
 router.put("/edit/:id", authMiddleware, async (req, res) => {
   try {
