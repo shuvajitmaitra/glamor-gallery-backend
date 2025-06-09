@@ -43,8 +43,18 @@ router.post("/create", authMiddleware, async (req, res) => {
     res.status(400).json({ success: false, error: err.message });
   }
 });
-// Get all products with pagination
+// Get all products
 router.get("/products", async (req, res) => {
+  try {
+    const products = await Product.find().sort({ createdAt: -1 });
+
+    res.json({ success: true, products });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+router.get("/v2/products", async (req, res) => {
   try {
     // Parse query parameters with defaults
     const page = parseInt(req.query.page) || 1;
