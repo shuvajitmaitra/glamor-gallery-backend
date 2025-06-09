@@ -46,7 +46,7 @@ router.post("/create", authMiddleware, async (req, res) => {
 // Get all products
 router.get("/products", async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
+    const products = await Product.find().sort({ productName: 1 }); // Sort A to Z
 
     res.json({ success: true, products });
   } catch (err) {
@@ -70,7 +70,10 @@ router.get("/v2/products", async (req, res) => {
 
     // Fetch products and total count concurrently
     const [products, totalProducts] = await Promise.all([
-      Product.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Product.find()
+        .sort({ productName: 1 }) // Sort A to Z
+        .skip(skip)
+        .limit(limit),
       Product.countDocuments(),
     ]);
 
