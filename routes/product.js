@@ -44,13 +44,16 @@ router.post("/create", authMiddleware, async (req, res) => {
   }
 });
 // Get all products with pagination
-router.get("/products", async (req, res) => {
+router.get("/product/products", async (req, res) => {
   try {
     // Parse query parameters with defaults
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 8; // Match frontend default limit
 
     // Validate query parameters
+    if (isNaN(page) || isNaN(limit)) {
+      return res.status(400).json({ success: false, error: "Page and limit must be valid numbers" });
+    }
     if (page < 1 || limit < 1) {
       return res.status(400).json({ success: false, error: "Page and limit must be positive integers" });
     }
@@ -59,7 +62,7 @@ router.get("/products", async (req, res) => {
     const skip = (page - 1) * limit;
 
     // Fetch products and total count concurrently
-    const [products, totalProducts] = await Promise.all([
+    const [products, totalCount] = await Promise.all([
       Product.find()
         .select("productName productImage sellingPrice availableSize stock description")
         .sort({ createdAt: -1 })
@@ -75,10 +78,10 @@ router.get("/products", async (req, res) => {
     const responseBody = {
       success: true,
       products,
-      totalProducts,
+      totalCount, // Added for frontend compatibility
+      totalPages: Math.ceil(totalCount / limit),
       page,
       limit,
-      totalPages: Math.ceil(totalProducts / limit),
       version: lastModified, // For cache versioning
     };
 
@@ -88,11 +91,17 @@ router.get("/products", async (req, res) => {
       return res.status(304).send();
     }
 
-    // Set version header for frontend cache
-    res.set("X-Data-Version", lastModified);
+    // Set caching headers
+    res.set({
+      "X-Data-Version": lastModified,
+      "Cache-Control": "public, max-age=300", // Cache for 5 minutes
+      ETag: lastModified,
+    });
+
     res.json(responseBody);
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    console.error("Error fetching products:", err);
+    res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 // Get product by ID
