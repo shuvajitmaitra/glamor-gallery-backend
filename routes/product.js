@@ -43,17 +43,58 @@ router.post("/create", authMiddleware, async (req, res) => {
     res.status(400).json({ success: false, error: err.message });
   }
 });
-// Get all products
+// Get all products with pagination
 router.get("/products", async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
+    // Parse query parameters with defaults
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
 
-    res.json({ success: true, products });
+    // Validate query parameters
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({ success: false, error: "Page and limit must be positive integers" });
+    }
+
+    // Calculate skip value for pagination
+    const skip = (page - 1) * limit;
+
+    // Fetch products and total count concurrently
+    const [products, totalProducts] = await Promise.all([
+      Product.find()
+        .select("productName productImage sellingPrice availableSize stock description")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Product.countDocuments(),
+    ]);
+
+    // Use last modified timestamp as version
+    const lastModified = new Date().toISOString();
+
+    // Prepare response
+    const responseBody = {
+      success: true,
+      products,
+      totalProducts,
+      page,
+      limit,
+      totalPages: Math.ceil(totalProducts / limit),
+      version: lastModified, // For cache versioning
+    };
+
+    // Check if client has cached version
+    const clientVersion = req.get("If-None-Match");
+    if (clientVersion && clientVersion === lastModified) {
+      return res.status(304).send();
+    }
+
+    // Set version header for frontend cache
+    res.set("X-Data-Version", lastModified);
+    res.json(responseBody);
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
-
 // Get product by ID
 router.get("/details/:id", async (req, res) => {
   try {
