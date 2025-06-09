@@ -60,16 +60,9 @@ router.get("/products", async (req, res) => {
 
     // Fetch products and total count concurrently
     const [products, totalProducts] = await Promise.all([
-      Product.find()
-        .select("productName productImage sellingPrice availableSize stock description")
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
+      Product.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
       Product.countDocuments(),
     ]);
-
-    // Use last modified timestamp as version
-    const lastModified = new Date().toISOString();
 
     // Prepare response
     const responseBody = {
@@ -79,17 +72,7 @@ router.get("/products", async (req, res) => {
       page,
       limit,
       totalPages: Math.ceil(totalProducts / limit),
-      version: lastModified, // For cache versioning
     };
-
-    // Check if client has cached version
-    const clientVersion = req.get("If-None-Match");
-    if (clientVersion && clientVersion === lastModified) {
-      return res.status(304).send();
-    }
-
-    // Set version header for frontend cache
-    res.set("X-Data-Version", lastModified);
     res.json(responseBody);
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
