@@ -83,7 +83,7 @@ const isAdmin = async (req, res, next) => {
 // Get all users (excluding the requesting admin)
 router.get("/users", isAdmin, async (req, res) => {
   try {
-    const users = await User.find({ _id: { $ne: req.adminId } }).select("-password");
+    const users = await User.find({ _id: { $ne: req.params.adminId } }).select("-password");
     res.json({ success: true, users });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
