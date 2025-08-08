@@ -7,7 +7,7 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const mongoose = require("mongoose");
 
 // Create product
-router.post("/create", authMiddleware, async (req, res) => {
+router.post("/create", async (req, res) => {
   try {
     const { productImage, ...otherFields } = req.body;
 
@@ -34,7 +34,6 @@ router.post("/create", authMiddleware, async (req, res) => {
     const product = new Product({
       ...otherFields,
       productImage: parsedProductImage || [], // Default to empty array if undefined
-      addedBy: req.userId,
     });
 
     await product.save();
@@ -105,7 +104,7 @@ router.get("/details/:id", async (req, res) => {
 });
 
 // Edit product
-router.put("/edit/:id", authMiddleware, async (req, res) => {
+router.put("/edit/:id", async (req, res) => {
   try {
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -132,7 +131,7 @@ router.put("/edit/:id", authMiddleware, async (req, res) => {
 });
 
 // Delete product
-router.delete("/delete/:id", authMiddleware, async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   try {
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -166,7 +165,7 @@ router.delete("/delete/:id", authMiddleware, async (req, res) => {
 });
 
 // Update stock
-router.put("/stock/:id", authMiddleware, async (req, res) => {
+router.put("/stock/:id", async (req, res) => {
   try {
     const { action, quantity, note } = req.body;
 
@@ -213,7 +212,6 @@ router.put("/stock/:id", authMiddleware, async (req, res) => {
           productId: req.params.id,
           productCode: updatedProduct.productCode,
           type: action,
-          userId: req.userId,
           quantity,
           note: note || "", // Use provided note or default to empty string
           currentStock: updatedProduct.stock,
@@ -231,7 +229,7 @@ router.put("/stock/:id", authMiddleware, async (req, res) => {
     res.status(400).json({ success: false, error: err.message });
   }
 });
-router.get("/history", authMiddleware, async (req, res) => {
+router.get("/history", async (req, res) => {
   try {
     const history = await History.find().populate("userId", "name").sort({ createdAt: -1 });
 
@@ -251,7 +249,7 @@ router.get("/history", authMiddleware, async (req, res) => {
   }
 });
 
-router.delete("/history/delete/:id", authMiddleware, async (req, res) => {
+router.delete("/history/delete/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
