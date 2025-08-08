@@ -3,7 +3,6 @@ const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
 const History = require("../models/History");
-const authMiddleware = require("../middlewares/authMiddleware");
 const mongoose = require("mongoose");
 
 // Create product
@@ -45,7 +44,8 @@ router.post("/create", async (req, res) => {
 // Get all products
 router.get("/products", async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.headers.user;
+    console.log(userId);
 
     const products = await Product.find().sort({ createdAt: -1 });
 

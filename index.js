@@ -1,24 +1,33 @@
-// index.js
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const authRoutes = require("./routes/auth.js");
 const productRoutes = require("./routes/product.js");
-// const historyRoutes = require("./routes/history.js");
 
+// Load environment variables
 dotenv.config();
+
+// Validate environment variables
+if (!process.env.MONGO_URI) {
+  console.error("Error: MONGO_URI is not defined in .env file");
+  process.exit(1);
+}
+
 const app = express();
 
-// Mongoose connection utility
+// MongoDB connection
 const connectDB = async () => {
-  if (mongoose.connections[0].readyState) return;
+  if (mongoose.connections[0].readyState) {
+    console.log("Already connected to MongoDB");
+    return;
+  }
 
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+      serverSelectionTimeoutMS: 5000,
     });
     console.log("MongoDB connected successfully");
   } catch (error) {
@@ -27,18 +36,19 @@ const connectDB = async () => {
   }
 };
 
-// Add CORS middleware before other middleware and routes
+// CORS configuration
 app.use(
   cors({
-    origin: "*", // Replace with your frontend URL
+    origin: "*", // Allow all origins for testing (local and Vercel)
     credentials: true,
-    allowedHeaders: ["Content-Type", "userId", "user-id"], // Explicitly allow userId
+    allowedHeaders: ["Content-Type", "userId", "user-id"],
   })
 );
 
+// Middleware
 app.use(express.json());
 
-// Health Check Route
+// Routes
 app.get("/", (req, res) => {
   res.status(200).json({
     status: "OK",
@@ -48,26 +58,25 @@ app.get("/", (req, res) => {
   });
 });
 
-// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/product", productRoutes);
-// app.use("/api/history", historyRoutes);
 
-const PORT = process.env.PORT || 5000;
+// Export for serverless (Vercel) and local use
+module.exports = { app, connectDB };
 
-// Export a function for serverless deployment
-module.exports = async (req, res) => {
-  await connectDB();
-
-  // Handle the request
-  if (req.method === "GET" && req.url === "/") {
-    res.status(200).json({
-      status: "OK",
-      message: "Server is running",
-      timestamp: new Date().toISOString(),
-      mongoConnectionState: mongoose.connection.readyState,
-    });
-  } else {
-    app(req, res);
-  }
-};
+// Start server for local development
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 9000;
+  const startServer = async () => {
+    try {
+      await connectDB();
+      app.listen(PORT, "0.0.0.0", () => {
+        console.log(`Server is running on http://0.0.0.0:${PORT}`);
+      });
+    } catch (error) {
+      console.error("Failed to start server:", error);
+      process.exit(1);
+    }
+  };
+  startServer();
+}
