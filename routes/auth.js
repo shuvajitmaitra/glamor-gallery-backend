@@ -82,11 +82,6 @@ router.put("/users/role", async (req, res) => {
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
-
-    if (user._id.toString() === req.adminId) {
-      return res.status(403).json({ success: false, message: "Cannot modify own role" });
-    }
-
     user.role = role;
     await user.save();
 
@@ -101,10 +96,6 @@ router.delete("/users/delete", async (req, res) => {
   const { userId } = req.body;
 
   try {
-    if (userId === req.adminId) {
-      return res.status(403).json({ success: false, message: "Cannot delete yourself" });
-    }
-
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
