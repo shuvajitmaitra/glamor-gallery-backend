@@ -80,16 +80,15 @@ const isAdmin = async (req, res, next) => {
   }
 };
 
-// Get all users (excluding the requesting admin)
-router.get("/users", isAdmin, async (req, res) => {
+// Get all users
+router.get("/users", async (req, res) => {
   try {
-    const users = await User.find({ _id: { $ne: req.params.adminId } }).select("-password");
+    const users = await User.find().select("-password");
     res.json({ success: true, users });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
-
 // Update user role
 router.put("/users/role", isAdmin, async (req, res) => {
   const { role, userId } = req.body;
