@@ -61,8 +61,14 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/product", productRoutes);
 
-// Export for serverless (Vercel) and local use
-module.exports = { app, connectDB };
+// Serverless handler for Vercel
+const serverlessHandler = async (req, res) => {
+  await connectDB();
+  app(req, res);
+};
+
+// Export for Vercel
+module.exports = serverlessHandler;
 
 // Start server for local development
 if (process.env.NODE_ENV !== "production") {
