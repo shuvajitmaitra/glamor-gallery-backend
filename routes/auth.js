@@ -67,7 +67,7 @@ const isAdmin = async (req, res, next) => {
   try {
     const adminId = req.headers.userId; // Check query first, then body
     if (!adminId) {
-      return res.status(400).json({ success: false, message: "Admin ID is required", header: req.headers.userId });
+      return res.status(400).json({ success: false, message: "Admin ID is required", header: req.headers });
     }
     const user = await User.findById(adminId);
     if (!user || user.role !== "admin") {
