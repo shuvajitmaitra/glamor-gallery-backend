@@ -65,7 +65,7 @@ router.post("/reset-password", async (req, res) => {
 // Middleware to check if user is admin
 const isAdmin = async (req, res, next) => {
   try {
-    const adminId = req.query.adminId || req.body.adminId; // Check query first, then body
+    const adminId = req.headers.userId; // Check query first, then body
     if (!adminId) {
       return res.status(400).json({ success: false, message: "Admin ID is required" });
     }
@@ -83,7 +83,7 @@ const isAdmin = async (req, res, next) => {
 // Get all users (excluding the requesting admin)
 router.get("/users", isAdmin, async (req, res) => {
   try {
-    const users = await User.find({ _id: { $ne: req.adminId } }).select("-password");
+    const users = await User.find({ _id: { $ne: req.headers.userId } }).select("-password");
     res.json({ success: true, users });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -91,10 +91,8 @@ router.get("/users", isAdmin, async (req, res) => {
 });
 
 // Update user role
-router.put("/users/:userId/role", isAdmin, async (req, res) => {
-  const { role } = req.body;
-  const { userId } = req.params;
-
+router.put("/users/role", isAdmin, async (req, res) => {
+  const { role, userId } = req.body;
   if (!["user", "admin", "seller"].includes(role)) {
     return res.status(400).json({ success: false, message: "Invalid role. Must be user, admin, or seller." });
   }
@@ -105,7 +103,7 @@ router.put("/users/:userId/role", isAdmin, async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    if (user._id.toString() === req.adminId) {
+    if (user._id.toString() === req.headers.userId) {
       return res.status(403).json({ success: false, message: "Cannot modify own role" });
     }
 
@@ -119,11 +117,11 @@ router.put("/users/:userId/role", isAdmin, async (req, res) => {
 });
 
 // Delete user
-router.delete("/users/:userId", isAdmin, async (req, res) => {
-  const { userId } = req.params;
+router.delete("/users/delete", isAdmin, async (req, res) => {
+  const { userId } = req.body;
 
   try {
-    if (userId === req.adminId) {
+    if (userId === req.headers.userId) {
       return res.status(403).json({ success: false, message: "Cannot delete yourself" });
     }
 
