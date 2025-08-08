@@ -63,4 +63,76 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
+// Middleware to check if user is admin
+const isAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.body.adminId);
+    if (!user || user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied. Admin privileges required." });
+    }
+    next();
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// Get all users (excluding the requesting admin)
+router.get("/users", isAdmin, async (req, res) => {
+  try {
+    const users = await User.find({ _id: { $ne: req.body.adminId } }).select("-password");
+    res.json({ success: true, users });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update user role
+router.put("/users/:userId/role", isAdmin, async (req, res) => {
+  const { role } = req.body;
+  const { userId } = req.params;
+
+  if (!["user", "admin", "seller"].includes(role)) {
+    return res.status(400).json({ success: false, message: "Invalid role. Must be user, admin, or seller." });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    if (user._id.toString() === req.body.adminId) {
+      return res.status(403).json({ success: false, message: "Cannot modify own role" });
+    }
+
+    user.role = role;
+    await user.save();
+
+    res.json({ success: true, message: "User role updated successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete user
+router.delete("/users/:userId", isAdmin, async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (userId === req.body.adminId) {
+      return res.status(403).json({ success: false, message: "Cannot delete yourself" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    await user.deleteOne();
+    res.json({ success: true, message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;
