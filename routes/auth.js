@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-const jwt = require("jsonwebtoken");
 
 router.post("/register", async (req, res) => {
   try {
@@ -66,10 +65,15 @@ router.post("/reset-password", async (req, res) => {
 // Middleware to check if user is admin
 const isAdmin = async (req, res, next) => {
   try {
-    const user = await User.findById(req.body.adminId);
+    const adminId = req.query.adminId || req.body.adminId; // Check query first, then body
+    if (!adminId) {
+      return res.status(400).json({ success: false, message: "Admin ID is required" });
+    }
+    const user = await User.findById(adminId);
     if (!user || user.role !== "admin") {
       return res.status(403).json({ success: false, message: "Access denied. Admin privileges required." });
     }
+    req.adminId = adminId; // Store adminId for use in routes
     next();
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -79,7 +83,7 @@ const isAdmin = async (req, res, next) => {
 // Get all users (excluding the requesting admin)
 router.get("/users", isAdmin, async (req, res) => {
   try {
-    const users = await User.find({ _id: { $ne: req.body.adminId } }).select("-password");
+    const users = await User.find({ _id: { $ne: req.adminId } }).select("-password");
     res.json({ success: true, users });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -101,7 +105,7 @@ router.put("/users/:userId/role", isAdmin, async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    if (user._id.toString() === req.body.adminId) {
+    if (user._id.toString() === req.adminId) {
       return res.status(403).json({ success: false, message: "Cannot modify own role" });
     }
 
@@ -119,7 +123,7 @@ router.delete("/users/:userId", isAdmin, async (req, res) => {
   const { userId } = req.params;
 
   try {
-    if (userId === req.body.adminId) {
+    if (userId === req.adminId) {
       return res.status(403).json({ success: false, message: "Cannot delete yourself" });
     }
 

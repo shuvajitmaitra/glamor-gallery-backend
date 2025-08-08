@@ -32,6 +32,8 @@ app.use(
   cors({
     origin: "*", // Replace with your frontend URL
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
   })
 );
 
