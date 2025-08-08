@@ -27,7 +27,6 @@ const productSchema = new mongoose.Schema(
     category: { type: String, required: true, trim: true },
     subCategory: { type: String, trim: true },
     description: { type: String, trim: true },
-    addedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
 );
