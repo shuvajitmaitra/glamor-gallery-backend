@@ -65,9 +65,9 @@ router.post("/reset-password", async (req, res) => {
 // Middleware to check if user is admin
 const isAdmin = async (req, res, next) => {
   try {
-    const adminId = req.body.adminId;
+    const adminId = req.params.adminId;
     if (!adminId) {
-      return res.status(400).json({ success: false, message: "Admin ID is required", body: req.body });
+      return res.status(400).json({ success: false, message: "Admin ID is required" });
     }
     const user = await User.findById(adminId);
     if (!user || user.role !== "admin") {
@@ -83,7 +83,7 @@ const isAdmin = async (req, res, next) => {
 // Get all users (excluding the requesting admin)
 router.get("/users", isAdmin, async (req, res) => {
   try {
-    const users = await User.find({ _id: { $ne: req.body.adminId } }).select("-password");
+    const users = await User.find({ _id: { $ne: req.adminId } }).select("-password");
     res.json({ success: true, users });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -103,7 +103,7 @@ router.put("/users/role", isAdmin, async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    if (user._id.toString() === req.body.adminId) {
+    if (user._id.toString() === req.adminId) {
       return res.status(403).json({ success: false, message: "Cannot modify own role" });
     }
 
@@ -121,7 +121,7 @@ router.delete("/users/delete", isAdmin, async (req, res) => {
   const { userId } = req.body;
 
   try {
-    if (userId === req.body.adminId) {
+    if (userId === req.adminId) {
       return res.status(403).json({ success: false, message: "Cannot delete yourself" });
     }
 
