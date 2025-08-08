@@ -91,7 +91,7 @@ router.get("/users", async (req, res) => {
   }
 });
 // Update user role
-router.put("/users/role", isAdmin, async (req, res) => {
+router.put("/users/role", authMiddleware, async (req, res) => {
   const { role, userId } = req.body;
   if (!["user", "admin", "seller"].includes(role)) {
     return res.status(400).json({ success: false, message: "Invalid role. Must be user, admin, or seller." });
@@ -117,11 +117,11 @@ router.put("/users/role", isAdmin, async (req, res) => {
 });
 
 // Delete user
-router.delete("/users/delete", isAdmin, async (req, res) => {
+router.delete("/users/delete", authMiddleware, async (req, res) => {
   const { userId } = req.body;
 
   try {
-    if (userId === req.adminId) {
+    if (userId === req.userId) {
       return res.status(403).json({ success: false, message: "Cannot delete yourself" });
     }
 
