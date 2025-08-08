@@ -32,6 +32,7 @@ app.use(
   cors({
     origin: "*", // Replace with your frontend URL
     credentials: true,
+    allowedHeaders: ["Content-Type", "userId", "user-id"], // Explicitly allow userId
   })
 );
 
