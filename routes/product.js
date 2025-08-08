@@ -45,9 +45,11 @@ router.post("/create", async (req, res) => {
 // Get all products
 router.get("/products", async (req, res) => {
   try {
+    const userId = req.headers.userId;
+
     const products = await Product.find().sort({ createdAt: -1 });
 
-    res.json({ success: true, products });
+    res.json({ success: true, products, userId });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
