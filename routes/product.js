@@ -1,9 +1,10 @@
 // routes/product.js
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const Product = require("../models/Product");
 const History = require("../models/History");
-const mongoose = require("mongoose");
+const adminCheck = require("../middlewares/adminCheck");
 
 // Create product
 router.post("/create", async (req, res) => {
@@ -44,8 +45,7 @@ router.post("/create", async (req, res) => {
 // Get all products
 router.get("/products", async (req, res) => {
   try {
-    const userId = req.headers.user;
-    console.log(userId);
+    const userId = req.headers.userid;
 
     const products = await Product.find().sort({ createdAt: -1 });
 
@@ -106,7 +106,7 @@ router.get("/details/:id", async (req, res) => {
 });
 
 // Edit product
-router.put("/edit/:id", async (req, res) => {
+router.put("/edit/:id", adminCheck, async (req, res) => {
   try {
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -133,7 +133,7 @@ router.put("/edit/:id", async (req, res) => {
 });
 
 // Delete product
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/delete/:id", adminCheck, async (req, res) => {
   try {
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -167,7 +167,7 @@ router.delete("/delete/:id", async (req, res) => {
 });
 
 // Update stock
-router.put("/stock/:id", async (req, res) => {
+router.put("/stock/:id", adminCheck, async (req, res) => {
   try {
     const { action, quantity, note } = req.body;
 

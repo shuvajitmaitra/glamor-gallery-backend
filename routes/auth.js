@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const adminCheck = require("../middlewares/adminCheck");
 
 router.post("/register", async (req, res) => {
   try {
@@ -62,7 +63,7 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
-router.get("/users", async (req, res) => {
+router.get("/users", adminCheck, async (req, res) => {
   try {
     const users = await User.find().select("-password");
     res.json({ success: true, users });

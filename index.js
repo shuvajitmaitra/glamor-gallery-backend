@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const authRoutes = require("./routes/auth.js");
 const productRoutes = require("./routes/product.js");
+const faqRoutes = require("./routes/faq.js");
 
 // Load environment variables
 dotenv.config();
@@ -60,6 +61,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/product", productRoutes);
+app.use("/api/faq", faqRoutes);
 
 // Serverless handler for Vercel
 const serverlessHandler = async (req, res) => {
